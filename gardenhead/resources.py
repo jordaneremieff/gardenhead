@@ -7,12 +7,12 @@ class SpeciesResource:
 
     BASE_URL = "https://bie-ws.ala.org.au"
 
-    def _get(self, url: str, params: dict = None) -> dict:
-        with httpx.Client(base_url=self.BASE_URL) as client:
-            req = client.get(url, params=params)
+    async def _get(self, url: str, params: dict = None) -> dict:
+        async with httpx.AsyncClient(base_url=self.BASE_URL) as client:
+            req = await client.get(url, params=params)
         return req.json()
 
-    def lookup_with_guid(self, guid: str) -> dict:
+    async def lookup_with_guid(self, guid: str) -> dict:
         """
         Species lookup with GUID - https://bie-ws.ala.org.au/ws/species/{guid}.json
 
@@ -20,10 +20,10 @@ class SpeciesResource:
         The guid for the taxon concept
 
         """
-        res = self._get(f"/ws/species/{guid}")
+        res = await self._get(f"/ws/species/{guid}")
         return res
 
-    def search(self, q: str, **params) -> dict:
+    async def search(self, q: str, **params) -> dict:
         """
         Species free text search services.
 
@@ -59,5 +59,5 @@ class SpeciesResource:
 
         req_params = {k: v for k, v in params.items() if v}
         req_params["q"] = quote(q)
-        res = self._get("/ws/search.json", params=req_params)
+        res = await self._get("/ws/search.json", params=req_params)
         return res
