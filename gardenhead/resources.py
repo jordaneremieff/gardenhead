@@ -5,7 +5,23 @@ from urllib.parse import quote
 
 class SpeciesResource:
 
-    BASE_URL = "https://bie-ws.ala.org.au/ws/"
+    BASE_URL = "https://bie-ws.ala.org.au"
+
+    def _get(self, url: str, params: dict = None) -> dict:
+        with httpx.Client(base_url=self.BASE_URL) as client:
+            req = client.get(url, params=params)
+        return req.json()
+
+    def lookup_with_guid(self, guid: str) -> dict:
+        """
+        Species lookup with GUID - https://bie-ws.ala.org.au/ws/species/{guid}.json
+
+        guid    String
+        The guid for the taxon concept
+
+        """
+        res = self._get(f"/ws/species/{guid}")
+        return res
 
     def search(self, q: str, **params) -> dict:
         """
@@ -41,9 +57,7 @@ class SpeciesResource:
         Available fields listed http://bie.ala.org.au/ws/indexFields.
         """
 
-        req_params = {k: v for k, v in params if v}
+        req_params = {k: v for k, v in params.items() if v}
         req_params["q"] = quote(q)
-
-        url = f"{self.BASE_URL}/search.json"
-        req = httpx.get(url, params=req_params)
-        return req.json()
+        res = self._get("/ws/search.json", params=req_params)
+        return res
