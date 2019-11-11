@@ -1,0 +1,6 @@
+pytest
+codecov
+pytest-cov
+black
+httpx
+mypy
